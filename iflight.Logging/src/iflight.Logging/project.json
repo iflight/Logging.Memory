@@ -1,0 +1,18 @@
+{
+  "version": "1.0.0-*",
+  "description": "iflight.Logging Class Library allows logging to memory use ILogger interfase",
+  "authors": [ "Igor Vinogradov" ],
+  "tags": [ "logging" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+  "frameworks": {
+    "net451": { },
+    "netcore50": { },
+    "dotnet5.4": { }
+  },
+  "dependencies": {
+    "Microsoft.Extensions.Configuration": "1.0.0-rc1-final",
+    "Microsoft.Extensions.Configuration.Abstractions": "1.0.0-rc1-final",
+    "Microsoft.Extensions.Logging.Abstractions": "1.0.0-rc1-final"
+  }
+}
