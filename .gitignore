@@ -1,0 +1,4 @@
+*.user 
+/iflight.Logging/.vs
+/iflight.Logging/artifacts
+/iflight.Logging/.vs/iflight.Logging/v14/.suo
