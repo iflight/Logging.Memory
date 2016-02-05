@@ -1,9 +1,9 @@
 {
-  "version": "1.0.0-*",
-  "description": "iflight.Logging Class Library allows logging to memory use ILogger interfase",
+  "version": "1.0.0",
+  "description": "iflight.Logging Class Library allows write log to memory",
   "authors": [ "Igor Vinogradov" ],
-  "tags": [ "logging" ],
-  "projectUrl": "",
+  "tags": [ "logging", "aspnet" ],
+  "projectUrl": "https://github.com/iflight/Logging",
   "licenseUrl": "",
   "frameworks": {
     "net451": { },
