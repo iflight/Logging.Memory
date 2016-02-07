@@ -4,7 +4,7 @@
   "authors": [ "Igor Vinogradov" ],
   "tags": [ "logging", "aspnet" ],
   "projectUrl": "https://github.com/iflight/Logging",
-  "releaseNotes": "Project renamed",
+  "releaseNotes": "Renamed project",
   "licenseUrl": "",
   "frameworks": {
     "net451": { },

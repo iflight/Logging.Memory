@@ -1,4 +1,4 @@
 *.user 
-/iflight.Logging/.vs
-/iflight.Logging/artifacts
-/iflight.Logging/.vs/iflight.Logging/v14/.suo
+/Logging.Memory/.vs
+/Logging.Memory/artifacts
+/Logging.Memory/.vs/iflight.Logging/v14/.suo
