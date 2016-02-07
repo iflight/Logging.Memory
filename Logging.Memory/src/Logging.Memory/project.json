@@ -1,11 +1,12 @@
 {
   "version": "1.0.0",
-  "description": "iflight.Logging Class Library allows write log to memory",
+  "description": "Logging.Memory allows write log to memory",
   "authors": [ "Igor Vinogradov" ],
   "tags": [ "logging", "aspnet" ],
+  "copyright": "Igor Vinogradov, 2016",
   "projectUrl": "https://github.com/iflight/Logging",
   "releaseNotes": "Renamed project",
-  "licenseUrl": "",
+  "licenseUrl": "https://github.com/iflight/Logging/blob/master/LICENSE",
   "frameworks": {
     "net451": { },
     "netcore50": { },

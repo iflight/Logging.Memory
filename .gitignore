@@ -1,4 +1,6 @@
 *.user 
-/Logging.Memory/.vs
+Logging.Memory/.vs
 /Logging.Memory/artifacts
-/Logging.Memory/.vs/iflight.Logging/v14/.suo
+/Logging.Memory/.vs/Logging.Memory/v14/.suo
+artifacts
+.suo
