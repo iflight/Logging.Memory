@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Logging.Memory</name>
+    </assembly>
+    <members>
+        <member name="M:iflight.Logging.MemoryLogger.#ctor(System.String,System.Func{System.String,Microsoft.Extensions.Logging.LogLevel,System.Boolean},System.Int32)">
+            <summary>
+            Максимальное кол-во записей в логе
+            </summary>
+            <remarks>
+            После обновления - изменения будут учтены при следующей записи в список (при добавлении следующей записи).
+            </remarks>
+        </member>
+        <member name="M:Microsoft.Extensions.Logging.MemoryLoggerExtensions.AddMemory(Microsoft.Extensions.Logging.ILoggerFactory)">
+            <summary>
+            Adds a memory logger that is enabled for <see cref="T:Microsoft.Extensions.Logging.LogLevel"/>.Information or higher.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.Logging.MemoryLoggerExtensions.AddMemory(Microsoft.Extensions.Logging.ILoggerFactory,System.Func{System.String,Microsoft.Extensions.Logging.LogLevel,System.Boolean})">
+            <summary>
+            Adds a memory logger that is enabled as defined by the filter function.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.Logging.MemoryLoggerExtensions.AddMemory(Microsoft.Extensions.Logging.ILoggerFactory,Microsoft.Extensions.Logging.LogLevel)">
+            <summary>
+            Adds a memory logger that is enabled for <see cref="T:Microsoft.Extensions.Logging.LogLevel"/>s of minLevel or higher.
+            </summary>
+            <param name="minLevel">The minimum <see cref="T:Microsoft.Extensions.Logging.LogLevel"/> to be logged</param>
+        </member>
+        <member name="M:Microsoft.Extensions.Logging.MemoryLoggerExtensions.AddMemory(Microsoft.Extensions.Logging.ILoggerFactory,System.Int32)">
+            <summary>
+            Adds a memory logger that is enabled for <see cref="T:Microsoft.Extensions.Logging.LogLevel"/>.Information or higher.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.Logging.MemoryLoggerExtensions.AddMemory(Microsoft.Extensions.Logging.ILoggerFactory,System.Func{System.String,Microsoft.Extensions.Logging.LogLevel,System.Boolean},System.Int32)">
+            <summary>
+            Adds a memory logger that is enabled as defined by the filter function.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.Logging.MemoryLoggerExtensions.AddMemory(Microsoft.Extensions.Logging.ILoggerFactory,Microsoft.Extensions.Logging.LogLevel,System.Int32)">
+            <summary>
+            Adds a memory logger that is enabled for <see cref="T:Microsoft.Extensions.Logging.LogLevel"/>s of minLevel or higher.
+            </summary>
+            <param name="minLevel">The minimum <see cref="T:Microsoft.Extensions.Logging.LogLevel"/> to be logged</param>
+        </member>
+        <member name="M:Microsoft.Extensions.Logging.MemoryLoggerExtensions.AddMemory(Microsoft.Extensions.Logging.ILoggerFactory,iflight.Logging.IMemoryLoggerSettings)">
+            <summary>
+            Adds a memory logger with settings object.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.Logging.MemoryLoggerExtensions.AddMemory(Microsoft.Extensions.Logging.ILoggerFactory,Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Adds a memory logger with settings from configuration.
+            </summary>
+        </member>
+    </members>
+</doc>
