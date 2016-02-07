@@ -1,4 +1,4 @@
-# Logging
+# Logging.Memory
 
 NuGet pakage [Logging.Memory](https://www.nuget.org/packages/Logging.Memory/)
 
