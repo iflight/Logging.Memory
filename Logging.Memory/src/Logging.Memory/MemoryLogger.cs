@@ -10,7 +10,7 @@
     {
         private const int _indentation = 2;
         private readonly string _name;
-        private readonly object _lock = new object();
+        private static object _lock = new object();
         private Func<string, LogLevel, bool> _filter;
 
         private static List<string> logList = new List<string>();
