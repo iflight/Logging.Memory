@@ -1,12 +1,12 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Logging.Memory allows write log to memory",
   "authors": [ "Igor Vinogradov" ],
   "tags": [ "logging", "aspnet" ],
   "copyright": "Igor Vinogradov, 2016",
-  "projectUrl": "https://github.com/iflight/Logging",
-  "releaseNotes": "Renamed project",
-  "licenseUrl": "https://github.com/iflight/Logging/blob/master/LICENSE",
+  "projectUrl": "https://github.com/iflight/Logging.Memory",
+  "releaseNotes": "Optimized storage logs.",
+  "licenseUrl": "https://github.com/iflight/Logging.Memory/blob/master/LICENSE",
   "frameworks": {
     "net451": { },
     "netcore50": { },

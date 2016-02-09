@@ -12,13 +12,7 @@
         private readonly string _name;
         private static object _lock = new object();
         private Func<string, LogLevel, bool> _filter;
-
-        private static List<string> logList = new List<string>();
-
-        public static List<string> LogList
-        {
-            get { return logList; }
-        }
+        private static int logListStartIndex = 0;
 
         /// <summary>
         /// Максимальное кол-во записей в логе
@@ -26,6 +20,28 @@
         /// <remarks>
         /// После обновления - изменения будут учтены при следующей записи в список (при добавлении следующей записи).
         /// </remarks>
+        public static int MaxLogCount = 200;
+
+        private static List<string> logList = new List<string>(MaxLogCount);
+
+        public static List<string> LogList
+        {
+            get
+            {
+                List<string> list = new List<string>();
+                if (logList.Count < MaxLogCount)
+                {
+                    list = logList.GetRange(0, logList.Count);
+                }
+                else
+                {
+                    list = new List<string>(logList.GetRange(logListStartIndex, MaxLogCount - logListStartIndex));
+                    var range = logList.GetRange(0, logListStartIndex);
+                    list.AddRange(range);
+                }
+                return list;
+            }
+        }
 
         public MemoryLogger(string name, Func<string, LogLevel, bool> filter, int maxLogCount)
         {
@@ -35,10 +51,6 @@
         }
 
         public string Name { get { return _name; } }
-
-        public bool IncludeScopes { get; set; }
-
-        public int MaxLogCount { get; set; }
 
         public Func<string, LogLevel, bool> Filter
         {
@@ -92,12 +104,22 @@
             }
             lock (_lock)
             {
-                var extraItemCount = logList.Count - MaxLogCount;
-                if (extraItemCount > 0)
+                if (logList.Count < MaxLogCount)
                 {
-                    logList.RemoveRange(0, extraItemCount);
+                    logList.Add(FormatMessage(logLevel, _name, message));
                 }
-                logList.Add(FormatMessage(logLevel, _name, message));
+                else
+                {
+                    logList[logListStartIndex] = FormatMessage(logLevel, _name, message);
+                }
+                if (logListStartIndex < MaxLogCount - 1)
+                {
+                    logListStartIndex++;
+                }
+                else
+                {
+                    logListStartIndex = 0;
+                }
             }
         }
 
