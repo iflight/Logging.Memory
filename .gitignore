@@ -4,3 +4,5 @@ Logging.Memory/.vs
 /Logging.Memory/.vs/Logging.Memory/v14/.suo
 artifacts
 .suo
+obj
+bin
