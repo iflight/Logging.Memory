@@ -68,59 +68,70 @@
         }
 
 
-        public void Log(LogLevel logLevel, int eventId, object state, Exception exception, Func<object, Exception, string> formatter)
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
             if (!IsEnabled(logLevel))
             {
                 return;
             }
-            var message = string.Empty;
-            var values = state as ILogValues;
-            if (formatter != null)
+
+            if (formatter == null)
             {
-                message = formatter(state, exception);
+                throw new ArgumentNullException(nameof(formatter));
             }
-            else if (values != null)
+
+            var message = formatter(state, exception);
+            // var values = state as ILogValues;
+
+            if (!string.IsNullOrEmpty(message))
             {
-                var builder = new StringBuilder();
-                FormatLogValues(
-                    builder,
-                    values,
-                    level: 1,
-                    bullet: false);
-                message = builder.ToString();
-                if (exception != null)
+                lock (_lock)
                 {
-                    message += Environment.NewLine + exception;
+                    if (logList.Count < MaxLogCount)
+                    {
+                        logList.Add(FormatMessage(logLevel, _name, message));
+                    }
+                    else
+                    {
+                        logList[logListStartIndex] = FormatMessage(logLevel, _name, message);
+                    }
+                    if (logListStartIndex < MaxLogCount - 1)
+                    {
+                        logListStartIndex++;
+                    }
+                    else
+                    {
+                        logListStartIndex = 0;
+                    }
+                }
+
+            }
+
+            if (exception != null)
+            {
+              
+                lock (_lock)
+                {
+                    if (logList.Count < MaxLogCount)
+                    {
+                        logList.Add(FormatMessage(logLevel, _name, exception.Message));
+                    }
+                    else
+                    {
+                        logList[logListStartIndex] = FormatMessage(logLevel, _name, exception.Message);
+                    }
+                    if (logListStartIndex < MaxLogCount - 1)
+                    {
+                        logListStartIndex++;
+                    }
+                    else
+                    {
+                        logListStartIndex = 0;
+                    }
                 }
             }
-            else
-            {
-                message = LogFormatter.Formatter(state, exception);
-            }
-            if (string.IsNullOrEmpty(message))
-            {
-                return;
-            }
-            lock (_lock)
-            {
-                if (logList.Count < MaxLogCount)
-                {
-                    logList.Add(FormatMessage(logLevel, _name, message));
-                }
-                else
-                {
-                    logList[logListStartIndex] = FormatMessage(logLevel, _name, message);
-                }
-                if (logListStartIndex < MaxLogCount - 1)
-                {
-                    logListStartIndex++;
-                }
-                else
-                {
-                    logListStartIndex = 0;
-                }
-            }
+
+
         }
 
         public virtual string FormatMessage(LogLevel logLevel, string logName, string message)
@@ -134,77 +145,14 @@
             return _filter(_name, logLevel);
         }
 
-        public IDisposable BeginScopeImpl(object state)
-        {
-            return new NoopDisposable();
-        }
-
-        private void FormatLogValues(StringBuilder builder, ILogValues logValues, int level, bool bullet)
-        {
-            var values = logValues.GetValues();
-            if (values == null)
-            {
-                return;
-            }
-            var isFirst = true;
-            foreach (var kvp in values)
-            {
-                builder.AppendLine();
-                if (bullet && isFirst)
-                {
-                    builder.Append(' ', level * _indentation - 1)
-                           .Append('-');
-                }
-                else
-                {
-                    builder.Append(' ', level * _indentation);
-                }
-                builder.Append(kvp.Key)
-                       .Append(": ");
-                if (kvp.Value is IEnumerable && !(kvp.Value is string))
-                {
-                    foreach (var value in (IEnumerable)kvp.Value)
-                    {
-                        if (value is ILogValues)
-                        {
-                            FormatLogValues(
-                                builder,
-                                (ILogValues)value,
-                                level + 1,
-                                bullet: true);
-                        }
-                        else
-                        {
-                            builder.AppendLine()
-                                   .Append(' ', (level + 1) * _indentation)
-                                   .Append(value);
-                        }
-                    }
-                }
-                else if (kvp.Value is ILogValues)
-                {
-                    FormatLogValues(
-                        builder,
-                        (ILogValues)kvp.Value,
-                        level + 1,
-                        bullet: false);
-                }
-                else
-                {
-                    builder.Append(kvp.Value);
-                }
-                isFirst = false;
-            }
-        }
-
         private static string GetRightPaddedLogLevelString(LogLevel logLevel)
         {
             switch (logLevel)
             {
+                case LogLevel.Trace:
+                    return "TRACE   ";
                 case LogLevel.Debug:
                     return "DEBUG   ";
-                case LogLevel.Verbose:
-                    return "VERBOSE ";
                 case LogLevel.Information:
                     return "INFO    ";
                 case LogLevel.Warning:
@@ -218,11 +166,14 @@
             }
         }
 
-        private class NoopDisposable : IDisposable
+        public IDisposable BeginScope<TState>(TState state)
         {
-            public void Dispose()
+            if (state == null)
             {
+                throw new ArgumentNullException(nameof(state));
             }
+
+            return MemoryLogScope.Push(Name, state);
         }
     }
 }

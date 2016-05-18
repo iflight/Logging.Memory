@@ -1,20 +1,36 @@
 {
-  "version": "1.0.1",
-  "description": "Logging.Memory allows write log to memory",
-  "authors": [ "Igor Vinogradov" ],
-  "tags": [ "logging", "aspnet" ],
+  "version": "1.1.0",
+  "title": "Logging.Memory",
   "copyright": "Igor Vinogradov, 2016",
-  "projectUrl": "https://github.com/iflight/Logging.Memory",
-  "releaseNotes": "Optimized storage logs.",
-  "licenseUrl": "https://github.com/iflight/Logging.Memory/blob/master/LICENSE",
-  "frameworks": {
-    "net451": { },
-    "netcore50": { },
-    "dotnet5.4": { }
+  "packOptions": {
+    "summary": "Logging.Memory allows write log to memory",
+    "tags": [ "logging", "aspnet", "aspnetcore" ],
+    "owners": [ "Igor Vinogradov" ],
+    "releaseNotes": "Upgrade to RC2",
+    "licenseUrl": "https://github.com/iflight/Logging.Memory/blob/master/LICENSE",
+    "projectUrl": "https://github.com/iflight/Logging.Memory",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/iflight/Logging.Memory.git"
+    }
   },
   "dependencies": {
-    "Microsoft.Extensions.Configuration": "1.0.0-rc1-final",
-    "Microsoft.Extensions.Configuration.Abstractions": "1.0.0-rc1-final",
-    "Microsoft.Extensions.Logging.Abstractions": "1.0.0-rc1-final"
+    "Microsoft.Extensions.Configuration.Abstractions": "1.0.0-rc2-final",
+    "Microsoft.Extensions.Logging.Abstractions": "1.0.0-rc2-final",
+    "Microsoft.Extensions.PlatformAbstractions": "1.0.0-rc2-final"
+  },
+  "frameworks": {
+    "net451": {
+      "frameworkAssemblies": {
+        "System.Runtime": {
+          "type": "build"
+        }
+      }
+    },
+    "netstandard1.3": {
+      "dependencies": {
+        "System.Threading": "4.0.11-*"
+      }
+    }
   }
 }
