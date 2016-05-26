@@ -1,6 +1,6 @@
 # Logging.Memory
 
-NuGet pakage [Logging.Memory](https://www.nuget.org/packages/Logging.Memory/)
+NuGet package [Logging.Memory](https://www.nuget.org/packages/Logging.Memory/)
 
 ## How to use
 
