@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("iflight.Logging")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Logging.Memory allows write log to memory")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Logging.Memory")]
