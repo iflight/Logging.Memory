@@ -1,56 +1,74 @@
 ﻿namespace iflight.Logging
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
-    using System.Text;
+    using System.Linq;
     using Microsoft.Extensions.Logging;
 
+    /// <summary>
+    /// In-memory logger
+    /// </summary>
     public class MemoryLogger : ILogger
     {
-        private const int _indentation = 2;
-        private readonly string _name;
         private static object _lock = new object();
         private Func<string, LogLevel, bool> _filter;
-        private static int logListStartIndex = 0;
 
         /// <summary>
-        /// Максимальное кол-во записей в логе
+        /// Max count of stored log lines
         /// </summary>
-        /// <remarks>
-        /// После обновления - изменения будут учтены при следующей записи в список (при добавлении следующей записи).
-        /// </remarks>
         public static int MaxLogCount = 200;
 
-        private static List<string> logList = new List<string>(MaxLogCount);
+        private static readonly Dictionary<LogLevel, LogLevelLog> logsDictionary = new Dictionary<LogLevel, LogLevelLog>();
 
+        /// <summary>
+        /// Last <see cref="MaxLogCount"/> log lines
+        /// </summary>
         public static List<string> LogList
         {
             get
             {
-                List<string> list = new List<string>();
-                if (logList.Count < MaxLogCount)
-                {
-                    list = logList.GetRange(0, logList.Count);
-                }
-                else
-                {
-                    list = new List<string>(logList.GetRange(logListStartIndex, MaxLogCount - logListStartIndex));
-                    var range = logList.GetRange(0, logListStartIndex);
-                    list.AddRange(range);
-                }
-                return list;
+                return logsDictionary
+                            .SelectMany(x => x.Value.logList)
+                            .OrderBy(x => x.Item2)
+                            .Take(MaxLogCount)
+                            .Select(x => x.Item2).ToList();
+            }
+        }
+
+        /// <summary>
+        /// Return last <see cref="MaxLogCount"/> log lines with specified logLevel
+        /// </summary>
+        /// <param name="logLevel"></param>
+        /// <returns></returns>
+        public static List<string> GetLog(LogLevel logLevel)
+        {
+            if (logsDictionary.TryGetValue(logLevel, out var log))
+            {
+                return log.logList.Select(x => x.Item2).ToList();
+            }
+            else
+            {
+                return Enumerable.Empty<string>().ToList();
+            }
+        }
+
+        static MemoryLogger()
+        {
+            foreach (var l in (LogLevel[])Enum.GetValues(typeof(LogLevel)))
+            {
+                if (l != LogLevel.None)
+                    logsDictionary.Add(l, new LogLevelLog(MaxLogCount));
             }
         }
 
         public MemoryLogger(string name, Func<string, LogLevel, bool> filter, int maxLogCount)
         {
-            _name = name;
+            Name = name;
             _filter = filter ?? ((category, logLevel) => true);
             MaxLogCount = maxLogCount;
         }
 
-        public string Name { get { return _name; } }
+        public string Name { get; private set; }
 
         public Func<string, LogLevel, bool> Filter
         {
@@ -61,7 +79,6 @@
                 {
                     throw new ArgumentNullException(nameof(value));
                 }
-
 
                 _filter = value;
             }
@@ -81,57 +98,57 @@
             }
 
             var message = formatter(state, exception);
-            // var values = state as ILogValues;
 
-            if (!string.IsNullOrEmpty(message))
+            if (logsDictionary.TryGetValue(logLevel, out var currentLog))
             {
-                lock (_lock)
+                if (!string.IsNullOrEmpty(message))
                 {
-                    if (logList.Count < MaxLogCount)
+                    lock (_lock)
                     {
-                        logList.Add(FormatMessage(logLevel, _name, message));
+                        if (currentLog.currentLogIndex < MaxLogCount)
+                        {
+                            currentLog.logList.Add(new Tuple<DateTime, string>(DateTime.Now, FormatMessage(logLevel, Name, message)));
+                        }
+                        else
+                        {
+                            currentLog.logList[currentLog.currentLogIndex] = new Tuple<DateTime, string>(DateTime.Now, FormatMessage(logLevel, Name, message));
+                        }
+                        if (currentLog.currentLogIndex < MaxLogCount - 1)
+                        {
+                            currentLog.currentLogIndex++;
+                        }
+                        else
+                        {
+                            currentLog.currentLogIndex = 0;
+                        }
                     }
-                    else
-                    {
-                        logList[logListStartIndex] = FormatMessage(logLevel, _name, message);
-                    }
-                    if (logListStartIndex < MaxLogCount - 1)
-                    {
-                        logListStartIndex++;
-                    }
-                    else
-                    {
-                        logListStartIndex = 0;
-                    }
+
                 }
 
-            }
-
-            if (exception != null)
-            {
-              
-                lock (_lock)
+                if (exception != null)
                 {
-                    if (logList.Count < MaxLogCount)
+
+                    lock (_lock)
                     {
-                        logList.Add(FormatMessage(logLevel, _name, exception.Message));
-                    }
-                    else
-                    {
-                        logList[logListStartIndex] = FormatMessage(logLevel, _name, exception.Message);
-                    }
-                    if (logListStartIndex < MaxLogCount - 1)
-                    {
-                        logListStartIndex++;
-                    }
-                    else
-                    {
-                        logListStartIndex = 0;
+                        if (currentLog.currentLogIndex < MaxLogCount)
+                        {
+                            currentLog.logList.Add(new Tuple<DateTime, string>(DateTime.Now, FormatMessage(logLevel, Name, exception.Message)));
+                        }
+                        else
+                        {
+                            currentLog.logList[currentLog.currentLogIndex] = new Tuple<DateTime, string>(DateTime.Now, FormatMessage(logLevel, Name, exception.Message));
+                        }
+                        if (currentLog.currentLogIndex < MaxLogCount - 1)
+                        {
+                            currentLog.currentLogIndex++;
+                        }
+                        else
+                        {
+                            currentLog.currentLogIndex = 0;
+                        }
                     }
                 }
             }
-
-
         }
 
         public virtual string FormatMessage(LogLevel logLevel, string logName, string message)
@@ -142,7 +159,7 @@
 
         public bool IsEnabled(LogLevel logLevel)
         {
-            return _filter(_name, logLevel);
+            return _filter(Name, logLevel);
         }
 
         private static string GetRightPaddedLogLevelString(LogLevel logLevel)
