@@ -20,3 +20,7 @@ NuGet package [Logging.Memory](https://www.nuget.org/packages/Logging.Memory/)
      
     var logList = MemoryLogger.LogList;
 
+Since v2.0.0 you can get log for concrete LogLevel:
+
+    var warnLog = MemoryLogger.GetLog(LogLevel.Warning);
+
