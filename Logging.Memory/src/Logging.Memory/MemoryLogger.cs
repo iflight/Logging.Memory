@@ -29,9 +29,11 @@
             {
                 return logsDictionary
                             .SelectMany(x => x.Value.logList)
-                            .OrderBy(x => x.Item2)
+                            .OrderByDescending(x => x.Item2)
                             .Take(MaxLogCount)
-                            .Select(x => x.Item2).ToList();
+                            .Select(x => x.Item2)
+                            .Reverse() // keep asc sort like in 1st version
+                            .ToList();
             }
         }
 
@@ -105,7 +107,7 @@
                 {
                     lock (_lock)
                     {
-                        if (currentLog.currentLogIndex < MaxLogCount)
+                        if (currentLog.logList.Count < MaxLogCount)
                         {
                             currentLog.logList.Add(new Tuple<DateTime, string>(DateTime.Now, FormatMessage(logLevel, Name, message)));
                         }
@@ -113,6 +115,7 @@
                         {
                             currentLog.logList[currentLog.currentLogIndex] = new Tuple<DateTime, string>(DateTime.Now, FormatMessage(logLevel, Name, message));
                         }
+
                         if (currentLog.currentLogIndex < MaxLogCount - 1)
                         {
                             currentLog.currentLogIndex++;
@@ -130,7 +133,7 @@
 
                     lock (_lock)
                     {
-                        if (currentLog.currentLogIndex < MaxLogCount)
+                        if (currentLog.logList.Count < MaxLogCount)
                         {
                             currentLog.logList.Add(new Tuple<DateTime, string>(DateTime.Now, FormatMessage(logLevel, Name, exception.Message)));
                         }

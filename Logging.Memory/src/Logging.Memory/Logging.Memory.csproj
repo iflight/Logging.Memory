@@ -10,7 +10,7 @@
     <PackageId>Logging.Memory</PackageId>
     <Description>Logging.Memory allows write log to memory</Description>
     <PackageTags>logging;aspnet;aspnetcore</PackageTags>
-    <PackageReleaseNotes>Separate logging for different LogLevel</PackageReleaseNotes>
+    <PackageReleaseNotes>Bug fixes</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/iflight/Logging.Memory</PackageProjectUrl>
     <PackageLicense>https://github.com/iflight/Logging.Memory/blob/master/LICENSE</PackageLicense>
     <RepositoryType>git</RepositoryType>
@@ -22,10 +22,10 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
     <Authors>Igor Vinogradov</Authors>
-    <Version>2.0.1</Version>
+    <Version>2.0.2</Version>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyVersion>2.0.1.0</AssemblyVersion>
-    <FileVersion>2.0.1.0</FileVersion>
+    <AssemblyVersion>2.0.2.0</AssemblyVersion>
+    <FileVersion>2.0.2.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
