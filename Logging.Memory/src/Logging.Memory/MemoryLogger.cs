@@ -29,7 +29,7 @@
             {
                 return logsDictionary
                             .SelectMany(x => x.Value.logList)
-                            .OrderByDescending(x => x.Item2)
+                            .OrderByDescending(x => x.Item1)
                             .Take(MaxLogCount)
                             .Select(x => x.Item2)
                             .Reverse() // keep asc sort like in 1st version
