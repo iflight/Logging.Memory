@@ -11,10 +11,13 @@
 
         private readonly Func<string, LogLevel, bool> _filter;
 
+        private readonly Func<LogLevel, string, string, string> formatter = null;
+
         private IMemoryLoggerSettings _settings;
 
-        public MemoryLoggerProvider(Func<string, LogLevel, bool> filter, int maxLogCount = 200)
+        public MemoryLoggerProvider(Func<string, LogLevel, bool> filter, int maxLogCount = 200, Func<LogLevel, string, string, string> formatter = null)
         {
+            this.formatter = formatter;
             _filter = filter;
             _settings = new MemoryLoggerSettings()
             {
@@ -62,7 +65,7 @@
 
         private MemoryLogger CreateLoggerImplementation(string name)
         {
-            return new MemoryLogger(name, GetFilter(name, _settings), _settings.MaxLogCount);
+            return new MemoryLogger(name, GetFilter(name, _settings), _settings.MaxLogCount, formatter);
         }
 
         private Func<string, LogLevel, bool> GetFilter(string name, IMemoryLoggerSettings settings)

@@ -13,6 +13,7 @@
         private static object _lock = new object();
         private Func<string, LogLevel, bool> _filter;
 
+        private Func<LogLevel, string, string, string> formatter = null;
         /// <summary>
         /// Max count of stored log lines
         /// </summary>
@@ -63,11 +64,12 @@
             }
         }
 
-        public MemoryLogger(string name, Func<string, LogLevel, bool> filter, int maxLogCount)
+        public MemoryLogger(string name, Func<string, LogLevel, bool> filter, int maxLogCount, Func<LogLevel, string, string, string> formatter)
         {
             Name = name;
             _filter = filter ?? ((category, logLevel) => true);
             MaxLogCount = maxLogCount;
+            this.formatter = formatter;
         }
 
         public string Name { get; private set; }
@@ -156,7 +158,13 @@
 
         public virtual string FormatMessage(LogLevel logLevel, string logName, string message)
         {
+            if (formatter != null)
+            {
+                return formatter(logLevel, logName, message);
+            }
+
             var logLevelString = GetRightPaddedLogLevelString(logLevel);
+
             return $"{DateTime.Now.ToString("HH:mm:ss,fff")} - {logLevelString}: [{logName}] {message}";
         }
 
