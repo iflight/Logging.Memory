@@ -47,7 +47,7 @@
         {
             if (logsDictionary.TryGetValue(logLevel, out var log))
             {
-                return log.logList.Select(x => x.Item2).ToList();
+                return log.logList.OrderBy(x => x.Item1).Select(x => x.Item2).ToList();
             }
             else
             {
