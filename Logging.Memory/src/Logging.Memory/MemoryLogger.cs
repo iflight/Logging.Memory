@@ -55,6 +55,31 @@
             }
         }
 
+        /// <summary>
+        /// Return log lines with logLevel more or equal than <paramref name="minLogLevel"/>
+        /// </summary>
+        /// <param name="minLogLevel">Min log level</param>
+        /// <returns>List of log lines</returns>
+        public static List<string> GetLogGte(LogLevel minLogLevel)
+        {
+            return logsDictionary.Where(x => x.Key >= minLogLevel)
+                        .SelectMany(x => x.Value.logList)
+                            .OrderBy(x => x.Item1).Select(x => x.Item2).ToList();
+        }
+
+
+        /// <summary>
+        /// Return log lines with logLevel less or equal than <paramref name="maxLogLevel"/>
+        /// </summary>
+        /// <param name="maxLogLevel">Max log level</param>
+        /// <returns>List of log lines</returns>
+        public static List<string> GetLogLte(LogLevel maxLogLevel)
+        {
+            return logsDictionary.Where(x => x.Key <= maxLogLevel)
+                        .SelectMany(x => x.Value.logList)
+                            .OrderBy(x => x.Item1).Select(x => x.Item2).ToList();
+        }
+
         static MemoryLogger()
         {
             foreach (var l in (LogLevel[])Enum.GetValues(typeof(LogLevel)))

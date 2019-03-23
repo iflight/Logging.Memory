@@ -10,7 +10,7 @@
     <PackageId>Logging.Memory</PackageId>
     <Description>Logging.Memory allows write log to memory</Description>
     <PackageTags>logging;aspnet;aspnetcore</PackageTags>
-    <PackageReleaseNotes>sorting bug fixed</PackageReleaseNotes>
+    <PackageReleaseNotes>GetLogGte/GetLogLte methods</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/iflight/Logging.Memory</PackageProjectUrl>
     <PackageLicense>https://github.com/iflight/Logging.Memory/blob/master/LICENSE</PackageLicense>
     <RepositoryType>git</RepositoryType>
@@ -22,10 +22,10 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
     <Authors>Igor Vinogradov</Authors>
-    <Version>2.0.5</Version>
+    <Version>2.1.0</Version>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyVersion>2.0.5.0</AssemblyVersion>
-    <FileVersion>2.0.5.0</FileVersion>
+    <AssemblyVersion>2.1.0.0</AssemblyVersion>
+    <FileVersion>2.1.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
