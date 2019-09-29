@@ -4,13 +4,12 @@
     <Copyright>Igor Vinogradov, 2016</Copyright>
     <AssemblyTitle>Logging.Memory</AssemblyTitle>
     <VersionPrefix>1.1.0</VersionPrefix>
-    <TargetFrameworks>net451;netstandard1.3</TargetFrameworks>
-    <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyName>Logging.Memory</AssemblyName>
     <PackageId>Logging.Memory</PackageId>
     <Description>Logging.Memory allows write log to memory</Description>
     <PackageTags>logging;aspnet;aspnetcore</PackageTags>
-    <PackageReleaseNotes>GetLogGte/GetLogLte methods</PackageReleaseNotes>
+    <PackageReleaseNotes>Update to netstandart2.0 (net core 3.0 compatible)</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/iflight/Logging.Memory</PackageProjectUrl>
     <PackageLicense>https://github.com/iflight/Logging.Memory/blob/master/LICENSE</PackageLicense>
     <RepositoryType>git</RepositoryType>
@@ -22,16 +21,16 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
     <Authors>Igor Vinogradov</Authors>
-    <Version>2.1.0</Version>
+    <Version>3.0.0-beta1</Version>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyVersion>2.1.0.0</AssemblyVersion>
-    <FileVersion>2.1.0.0</FileVersion>
+    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+    <FileVersion>3.0.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="1.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.0.1" />
-    <PackageReference Include="Microsoft.Extensions.PlatformAbstractions" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.PlatformAbstractions" Version="1.1.0" />
   </ItemGroup>
 
 </Project>

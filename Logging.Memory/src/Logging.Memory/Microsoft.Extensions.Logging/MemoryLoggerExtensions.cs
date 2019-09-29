@@ -1,8 +1,10 @@
-﻿namespace Microsoft.Extensions.Logging
+﻿using System;
+using Microsoft.Extensions.Configuration;
+using Logging.Memory;
+using Logging.Memory.Settings;
+
+namespace Microsoft.Extensions.Logging
 {
-    using System;
-    using iflight.Logging;
-    using Microsoft.Extensions.Configuration;
 
     /// <summary>
     /// Extensions for memoryLogger
@@ -10,7 +12,7 @@
     public static class MemoryLoggerExtensions
     {
         /// <summary>
-        /// Adds a memory logger that is enabled for <see cref="LogLevel"/>.Information or higher.
+        /// Adds a memory logger that is enabled for <see cref="LogLevel.Information"/> or higher.
         /// </summary>
         public static ILoggerFactory AddMemory(this ILoggerFactory factory)
         {
@@ -26,14 +28,16 @@
         /// <summary>
         /// Adds a memory logger that is enabled as defined by the filter function.
         /// </summary>
-        public static ILoggerFactory AddMemory(this ILoggerFactory factory, Func<string, LogLevel, bool> filter, Func<LogLevel, string, string, string> formatter = null)
+        public static ILoggerFactory AddMemory(this ILoggerFactory factory,
+                                                    Func<string, LogLevel, bool> filter,
+                                                    Func<LogLevel, string, string, Exception, string> logLineFormatter = null)
         {
             if (factory == null)
             {
                 throw new ArgumentNullException(nameof(factory));
             }
 
-            factory.AddProvider(new MemoryLoggerProvider(filter, formatter: formatter));
+            factory.AddProvider(new MemoryLoggerProvider(filter, logLineFormatter: logLineFormatter));
             return factory;
         }
 
@@ -41,20 +45,22 @@
         /// Adds a memory logger that is enabled for <see cref="LogLevel"/>s of minLevel or higher.
         /// </summary>
         /// <param name="minLevel">The minimum <see cref="LogLevel"/> to be logged</param>
-        /// <param name="formatter">Formatter for output log line</param>
-        public static ILoggerFactory AddMemory(this ILoggerFactory factory, LogLevel minLevel, Func<LogLevel, string, string, string> formatter = null)
+        /// <param name="logLineFormatter">Formatter for output log line</param>
+        public static ILoggerFactory AddMemory(this ILoggerFactory factory,
+                                                    LogLevel minLevel, 
+                                                    Func<LogLevel, string, string, Exception, string> logLineFormatter = null)
         {
             if (factory == null)
             {
                 throw new ArgumentNullException(nameof(factory));
             }
 
-            factory.AddProvider(new MemoryLoggerProvider((category, logLevel) => logLevel >= minLevel, formatter: formatter));
+            factory.AddProvider(new MemoryLoggerProvider((category, logLevel) => logLevel >= minLevel, logLineFormatter: logLineFormatter));
             return factory;
         }
 
         /// <summary>
-        /// Adds a memory logger that is enabled for <see cref="LogLevel"/>.Information or higher.
+        /// Adds a memory logger that is enabled for <see cref="LogLevel.Information"/> or higher.
         /// </summary>
         public static ILoggerFactory AddMemory(this ILoggerFactory factory, int maxLogCount)
         {
@@ -82,9 +88,11 @@
         }
 
         /// <summary>
-        /// Adds a memory logger that is enabled for <see cref="LogLevel"/>s of minLevel or higher.
+        /// Adds a memory logger that is enabled for <see cref="LogLevel"/> of minLevel or higher.
         /// </summary>
+        /// <param name="factory">ILoggerFactory</param>
         /// <param name="minLevel">The minimum <see cref="LogLevel"/> to be logged</param>
+        /// <param name="maxLogCount">Count of stored log lines</param>
         public static ILoggerFactory AddMemory(this ILoggerFactory factory, LogLevel minLevel, int maxLogCount)
         {
             if (factory == null)

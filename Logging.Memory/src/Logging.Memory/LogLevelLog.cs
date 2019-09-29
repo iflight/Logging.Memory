@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace iflight.Logging
+namespace Logging.Memory
 {
-    internal class LogLevelLog
+    internal class LevelLog
     {
-        public LogLevelLog(int maxLogsCount)
+        internal LevelLog(int maxLogsCount)
         {
             logList = new List<Tuple<DateTime, string>>(maxLogsCount);
         }
 
-        public int currentLogIndex = 0;
+        internal int currentLogIndex = 0;
 
-        public List<Tuple<DateTime, string>> logList;
+        internal List<Tuple<DateTime, string>> logList;
 
     }
 }

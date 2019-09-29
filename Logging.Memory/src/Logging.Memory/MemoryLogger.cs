@@ -1,4 +1,4 @@
-﻿namespace iflight.Logging
+﻿namespace Logging.Memory
 {
     using System;
     using System.Collections.Generic;
@@ -10,16 +10,40 @@
     /// </summary>
     public class MemoryLogger : ILogger
     {
-        private static object _lock = new object();
-        private Func<string, LogLevel, bool> _filter;
+        private static object lockObj = new object();
 
-        private Func<LogLevel, string, string, string> formatter = null;
+        private Func<string, LogLevel, bool> filter;
+
+        private Func<LogLevel, string, string, Exception, string> formatter = null;
+
+        private static readonly Dictionary<LogLevel, LevelLog> logsDictionary = new Dictionary<LogLevel, LevelLog>();
+
         /// <summary>
         /// Max count of stored log lines
         /// </summary>
         public static int MaxLogCount = 200;
 
-        private static readonly Dictionary<LogLevel, LogLevelLog> logsDictionary = new Dictionary<LogLevel, LogLevelLog>();
+        /// <summary>
+        /// Logger name
+        /// </summary>
+        public string Name { get; private set; }
+
+        /// <summary>
+        /// Logger filter
+        /// </summary>
+        public Func<string, LogLevel, bool> Filter
+        {
+            get { return this.filter; }
+            set
+            {
+                if (value == null)
+                {
+                    throw new ArgumentNullException(nameof(value));
+                }
+
+                this.filter = value;
+            }
+        }
 
         /// <summary>
         /// Last <see cref="MaxLogCount"/> log lines
@@ -41,7 +65,7 @@
         /// <summary>
         /// Return last <see cref="MaxLogCount"/> log lines with specified logLevel
         /// </summary>
-        /// <param name="logLevel"></param>
+        /// <param name="logLevel">log level for return</param>
         /// <returns></returns>
         public static List<string> GetLog(LogLevel logLevel)
         {
@@ -82,37 +106,21 @@
 
         static MemoryLogger()
         {
-            foreach (var l in (LogLevel[])Enum.GetValues(typeof(LogLevel)))
+            foreach (var level in ((LogLevel[])Enum.GetValues(typeof(LogLevel))).Where(x => x != LogLevel.None))
             {
-                if (l != LogLevel.None)
-                    logsDictionary.Add(l, new LogLevelLog(MaxLogCount));
+                logsDictionary.Add(level, new LevelLog(MaxLogCount));
             }
         }
 
-        public MemoryLogger(string name, Func<string, LogLevel, bool> filter, int maxLogCount, Func<LogLevel, string, string, string> formatter)
+        public MemoryLogger(string name, Func<string, LogLevel, bool> filter, 
+                                int maxLogCount, 
+                                Func<LogLevel, string, string, Exception, string> formatter)
         {
             Name = name;
-            _filter = filter ?? ((category, logLevel) => true);
+            this.filter = filter ?? ((category, logLevel) => true);
             MaxLogCount = maxLogCount;
-            this.formatter = formatter;
+            this.formatter = formatter ?? DefaultLogLineFormatter.Formatter;
         }
-
-        public string Name { get; private set; }
-
-        public Func<string, LogLevel, bool> Filter
-        {
-            get { return _filter; }
-            set
-            {
-                if (value == null)
-                {
-                    throw new ArgumentNullException(nameof(value));
-                }
-
-                _filter = value;
-            }
-        }
-
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
@@ -132,15 +140,16 @@
             {
                 if (!string.IsNullOrEmpty(message))
                 {
-                    lock (_lock)
+                    var preparedMessage = this.formatter(logLevel, Name, message, exception);
+                    lock (lockObj)
                     {
                         if (currentLog.logList.Count < MaxLogCount)
                         {
-                            currentLog.logList.Add(new Tuple<DateTime, string>(DateTime.Now, FormatMessage(logLevel, Name, message)));
+                            currentLog.logList.Add(new Tuple<DateTime, string>(DateTime.Now, preparedMessage));
                         }
                         else
                         {
-                            currentLog.logList[currentLog.currentLogIndex] = new Tuple<DateTime, string>(DateTime.Now, FormatMessage(logLevel, Name, message));
+                            currentLog.logList[currentLog.currentLogIndex] = new Tuple<DateTime, string>(DateTime.Now, preparedMessage);
                         }
 
                         if (currentLog.currentLogIndex < MaxLogCount - 1)
@@ -154,69 +163,16 @@
                     }
 
                 }
-
-                if (exception != null)
-                {
-
-                    lock (_lock)
-                    {
-                        if (currentLog.logList.Count < MaxLogCount)
-                        {
-                            currentLog.logList.Add(new Tuple<DateTime, string>(DateTime.Now, FormatMessage(logLevel, Name, exception.Message)));
-                        }
-                        else
-                        {
-                            currentLog.logList[currentLog.currentLogIndex] = new Tuple<DateTime, string>(DateTime.Now, FormatMessage(logLevel, Name, exception.Message));
-                        }
-                        if (currentLog.currentLogIndex < MaxLogCount - 1)
-                        {
-                            currentLog.currentLogIndex++;
-                        }
-                        else
-                        {
-                            currentLog.currentLogIndex = 0;
-                        }
-                    }
-                }
             }
         }
 
-        public virtual string FormatMessage(LogLevel logLevel, string logName, string message)
-        {
-            if (formatter != null)
-            {
-                return formatter(logLevel, logName, message);
-            }
-
-            var logLevelString = GetRightPaddedLogLevelString(logLevel);
-
-            return $"{DateTime.Now.ToString("HH:mm:ss,fff")} - {logLevelString}: [{logName}] {message}";
-        }
-
+        /// <summary>
+        /// Check is <paramref name="logLevel"/> enabled to loggin
+        /// </summary>
+        /// <param name="logLevel">log level to check</param>
         public bool IsEnabled(LogLevel logLevel)
         {
-            return _filter(Name, logLevel);
-        }
-
-        private static string GetRightPaddedLogLevelString(LogLevel logLevel)
-        {
-            switch (logLevel)
-            {
-                case LogLevel.Trace:
-                    return "TRACE   ";
-                case LogLevel.Debug:
-                    return "DEBUG   ";
-                case LogLevel.Information:
-                    return "INFO    ";
-                case LogLevel.Warning:
-                    return "WARNING ";
-                case LogLevel.Error:
-                    return "ERROR   ";
-                case LogLevel.Critical:
-                    return "CRITICAL";
-                default:
-                    return "UNKNOWN ";
-            }
+            return this.filter(Name, logLevel);
         }
 
         public IDisposable BeginScope<TState>(TState state)
@@ -228,5 +184,6 @@
 
             return MemoryLogScope.Push(Name, state);
         }
+
     }
 }

@@ -1,23 +1,26 @@
-﻿namespace iflight.Logging
-{
-    using System;
-    using Microsoft.Extensions.Logging;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
+﻿using System;
+using Microsoft.Extensions.Logging;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using Logging.Memory.Settings;
 
+namespace Logging.Memory
+{
     public class MemoryLoggerProvider : ILoggerProvider
     {
         private readonly ConcurrentDictionary<string, MemoryLogger> _loggers = new ConcurrentDictionary<string, MemoryLogger>();
 
         private readonly Func<string, LogLevel, bool> _filter;
 
-        private readonly Func<LogLevel, string, string, string> formatter = null;
+        private readonly Func<LogLevel, string, string, Exception, string> logLineFormatter = null;
 
         private IMemoryLoggerSettings _settings;
 
-        public MemoryLoggerProvider(Func<string, LogLevel, bool> filter, int maxLogCount = 200, Func<LogLevel, string, string, string> formatter = null)
+        public MemoryLoggerProvider(Func<string, LogLevel, bool> filter,
+                                        int maxLogCount = 200,
+                                        Func<LogLevel, string, string, Exception, string> logLineFormatter = null)
         {
-            this.formatter = formatter;
+            this.logLineFormatter = logLineFormatter;
             _filter = filter;
             _settings = new MemoryLoggerSettings()
             {
@@ -65,7 +68,7 @@
 
         private MemoryLogger CreateLoggerImplementation(string name)
         {
-            return new MemoryLogger(name, GetFilter(name, _settings), _settings.MaxLogCount, formatter);
+            return new MemoryLogger(name, GetFilter(name, _settings), _settings.MaxLogCount, logLineFormatter);
         }
 
         private Func<string, LogLevel, bool> GetFilter(string name, IMemoryLoggerSettings settings)
@@ -105,10 +108,9 @@
             }
         }
 
-
-
         public void Dispose()
         {
+            _loggers.Clear();
         }
     }
 }
