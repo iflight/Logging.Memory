@@ -14,9 +14,9 @@
 
         private Func<string, LogLevel, bool> filter;
 
-        private Func<LogLevel, string, string, Exception, string> formatter = null;
+        private Func<LogLevel, string, string, Exception, string> logLineFormatter = null;
 
-        private static readonly Dictionary<LogLevel, LevelLog> logsDictionary = new Dictionary<LogLevel, LevelLog>();
+        private static readonly Dictionary<LogLevel, LogForLevel> logsDictionary = new Dictionary<LogLevel, LogForLevel>();
 
         /// <summary>
         /// Max count of stored log lines
@@ -91,7 +91,6 @@
                             .OrderBy(x => x.Item1).Select(x => x.Item2).ToList();
         }
 
-
         /// <summary>
         /// Return log lines with logLevel less or equal than <paramref name="maxLogLevel"/>
         /// </summary>
@@ -108,20 +107,29 @@
         {
             foreach (var level in ((LogLevel[])Enum.GetValues(typeof(LogLevel))).Where(x => x != LogLevel.None))
             {
-                logsDictionary.Add(level, new LevelLog(MaxLogCount));
+                logsDictionary.Add(level, new LogForLevel(MaxLogCount));
             }
         }
 
+        /// <summary>
+        /// default constructor
+        /// </summary>
+        /// <param name="name">logger name</param>
+        /// <param name="filter">filter log entities</param>
+        /// <param name="maxLogCount">max count of stored lines of log (for each level)</param>
+        /// <param name="logLineFormatter">string formatter for log line</param>
         public MemoryLogger(string name, Func<string, LogLevel, bool> filter, 
                                 int maxLogCount, 
-                                Func<LogLevel, string, string, Exception, string> formatter)
+                                Func<LogLevel, string, string, Exception, string> logLineFormatter)
         {
             Name = name;
             this.filter = filter ?? ((category, logLevel) => true);
             MaxLogCount = maxLogCount;
-            this.formatter = formatter ?? DefaultLogLineFormatter.Formatter;
+            this.logLineFormatter = logLineFormatter ?? DefaultLogLineFormatter.Formatter;
         }
 
+        #region ILog implementation
+        /// <inheritdoc />
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
             if (!IsEnabled(logLevel))
@@ -140,7 +148,7 @@
             {
                 if (!string.IsNullOrEmpty(message))
                 {
-                    var preparedMessage = this.formatter(logLevel, Name, message, exception);
+                    var preparedMessage = this.logLineFormatter(logLevel, Name, message, exception);
                     lock (lockObj)
                     {
                         if (currentLog.logList.Count < MaxLogCount)
@@ -166,15 +174,13 @@
             }
         }
 
-        /// <summary>
-        /// Check is <paramref name="logLevel"/> enabled to loggin
-        /// </summary>
-        /// <param name="logLevel">log level to check</param>
+        /// <inheritdoc />
         public bool IsEnabled(LogLevel logLevel)
         {
             return this.filter(Name, logLevel);
         }
 
+        /// <inheritdoc />
         public IDisposable BeginScope<TState>(TState state)
         {
             if (state == null)
@@ -184,6 +190,6 @@
 
             return MemoryLogScope.Push(Name, state);
         }
-
+        #endregion
     }
 }

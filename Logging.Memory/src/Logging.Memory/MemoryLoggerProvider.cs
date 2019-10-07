@@ -6,6 +6,9 @@ using Logging.Memory.Settings;
 
 namespace Logging.Memory
 {
+    /// <summary>
+    /// In-memory logging provider
+    /// </summary>
     public class MemoryLoggerProvider : ILoggerProvider
     {
         private readonly ConcurrentDictionary<string, MemoryLogger> _loggers = new ConcurrentDictionary<string, MemoryLogger>();
@@ -16,6 +19,12 @@ namespace Logging.Memory
 
         private IMemoryLoggerSettings _settings;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="maxLogCount"></param>
+        /// <param name="logLineFormatter"></param>
         public MemoryLoggerProvider(Func<string, LogLevel, bool> filter,
                                         int maxLogCount = 200,
                                         Func<LogLevel, string, string, Exception, string> logLineFormatter = null)
@@ -28,6 +37,10 @@ namespace Logging.Memory
             };
         }
 
+        /// <summary>
+        /// Coustructor with settings object
+        /// </summary>
+        /// <param name="settings">settings object</param>
         public MemoryLoggerProvider(IMemoryLoggerSettings settings)
         {
             if (settings == null)
@@ -61,6 +74,7 @@ namespace Logging.Memory
             }
         }
 
+        /// <inheritdoc />
         public ILogger CreateLogger(string name)
         {
             return _loggers.GetOrAdd(name, CreateLoggerImplementation);

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace Logging.Memory
 {
-    internal class LevelLog
+    internal class LogForLevel
     {
-        internal LevelLog(int maxLogsCount)
+        internal LogForLevel(int maxLogsCount)
         {
             logList = new List<Tuple<DateTime, string>>(maxLogsCount);
         }
