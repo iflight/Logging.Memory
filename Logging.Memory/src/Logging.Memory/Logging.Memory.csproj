@@ -9,7 +9,7 @@
     <PackageId>Logging.Memory</PackageId>
     <Description>Logging.Memory allows write log to memory</Description>
     <PackageTags>logging;aspnet;aspnetcore</PackageTags>
-    <PackageReleaseNotes>Update to netstandart2.0 (net core 3.0 compatible). Clean up. Project files reorganized</PackageReleaseNotes>
+    <PackageReleaseNotes>dependencies optimized</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/iflight/Logging.Memory</PackageProjectUrl>
     <PackageLicense>https://github.com/iflight/Logging.Memory/blob/master/LICENSE</PackageLicense>
     <RepositoryType>git</RepositoryType>
@@ -21,10 +21,10 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
     <Authors>Igor Vinogradov</Authors>
-    <Version>3.0.0</Version>
+    <Version>3.0.1</Version>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyVersion>3.0.0.0</AssemblyVersion>
-    <FileVersion>3.0.0.0</FileVersion>
+    <AssemblyVersion>3.0.1.0</AssemblyVersion>
+    <FileVersion>3.0.1.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
