@@ -7,12 +7,12 @@ namespace Logging.Memory
     {
         internal LogForLevel(int maxLogsCount)
         {
-            logList = new List<Tuple<DateTime, string>>(maxLogsCount);
+            logList = new List<(DateTime time, string line)>(maxLogsCount);
         }
 
         internal int currentLogIndex = 0;
 
-        internal List<Tuple<DateTime, string>> logList;
+        internal List<(DateTime time, string line)> logList;
 
     }
 }

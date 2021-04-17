@@ -10,11 +10,11 @@
     /// </summary>
     public class MemoryLogger : ILogger
     {
-        private static object lockObj = new object();
+        private static readonly object lockObj = new object();
 
         private Func<string, LogLevel, bool> filter;
 
-        private Func<LogLevel, string, string, Exception, string> logLineFormatter = null;
+        private readonly Func<LogLevel, string, string, Exception, string> logLineFormatter = null;
 
         private static readonly Dictionary<LogLevel, LogForLevel> logsDictionary = new Dictionary<LogLevel, LogForLevel>();
 
@@ -36,12 +36,7 @@
             get { return this.filter; }
             set
             {
-                if (value == null)
-                {
-                    throw new ArgumentNullException(nameof(value));
-                }
-
-                this.filter = value;
+                this.filter = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 
@@ -52,13 +47,40 @@
         {
             get
             {
+                return LogListWithTime.Select(x=>x.line).ToList();
+            }
+        }
+
+        /// <summary>
+        /// Last <see cref="MaxLogCount"/> log lines with time of add for each line
+        /// </summary>
+        public static List<(DateTime time,string line)> LogListWithTime
+        {
+            get
+            {
                 return logsDictionary
                             .SelectMany(x => x.Value.logList)
-                            .OrderByDescending(x => x.Item1)
+                            .OrderByDescending(x => x.time)
                             .Take(MaxLogCount)
-                            .Select(x => x.Item2)
                             .Reverse() // keep asc sort like in 1st version
                             .ToList();
+            }
+        }
+
+        /// <summary>
+        /// Return last <see cref="MaxLogCount"/> log lines of specified logLevel with time of add for each line
+        /// </summary>
+        /// <param name="logLevel">log level for return</param>
+        /// <returns>List of log lines with time</returns>
+        public static List<(DateTime time, string line)> GetLogWithTime(LogLevel logLevel)
+        {
+            if (logsDictionary.TryGetValue(logLevel, out var log))
+            {
+                return log.logList.OrderBy(x => x.time).ToList();
+            }
+            else
+            {
+                return Enumerable.Empty<(DateTime time, string line)>().ToList();
             }
         }
 
@@ -66,17 +88,22 @@
         /// Return last <see cref="MaxLogCount"/> log lines with specified logLevel
         /// </summary>
         /// <param name="logLevel">log level for return</param>
-        /// <returns></returns>
+        /// <returns>List of log lines</returns>
         public static List<string> GetLog(LogLevel logLevel)
         {
-            if (logsDictionary.TryGetValue(logLevel, out var log))
-            {
-                return log.logList.OrderBy(x => x.Item1).Select(x => x.Item2).ToList();
-            }
-            else
-            {
-                return Enumerable.Empty<string>().ToList();
-            }
+            return GetLogWithTime(logLevel).Select(x => x.line).ToList();
+        }
+
+        /// <summary>
+        /// Return log lines with time of add for each line of logLevel more or equal than <paramref name="minLogLevel"/> 
+        /// </summary>
+        /// <param name="minLogLevel">Min log level</param>
+        /// <returns>List of log lines with time</returns>
+        public static List<(DateTime time,string line)> GetLogGteWithTime(LogLevel minLogLevel)
+        {
+            return logsDictionary.Where(x => x.Key >= minLogLevel)
+                        .SelectMany(x => x.Value.logList)
+                            .OrderBy(x => x.time).ToList();
         }
 
         /// <summary>
@@ -86,9 +113,19 @@
         /// <returns>List of log lines</returns>
         public static List<string> GetLogGte(LogLevel minLogLevel)
         {
-            return logsDictionary.Where(x => x.Key >= minLogLevel)
+            return GetLogGteWithTime(minLogLevel).Select(x => x.line).ToList();
+        }
+
+        /// <summary>
+        /// Return log lines with time of add for each line of logLevel less or equal than <paramref name="maxLogLevel"/>
+        /// </summary>
+        /// <param name="maxLogLevel">Max log level</param>
+        /// <returns>List of log lines with time</returns>
+        public static List<(DateTime time, string line)> GetLogLteWithTime(LogLevel maxLogLevel)
+        {
+            return logsDictionary.Where(x => x.Key <= maxLogLevel)
                         .SelectMany(x => x.Value.logList)
-                            .OrderBy(x => x.Item1).Select(x => x.Item2).ToList();
+                            .OrderBy(x => x.time).ToList();
         }
 
         /// <summary>
@@ -98,9 +135,7 @@
         /// <returns>List of log lines</returns>
         public static List<string> GetLogLte(LogLevel maxLogLevel)
         {
-            return logsDictionary.Where(x => x.Key <= maxLogLevel)
-                        .SelectMany(x => x.Value.logList)
-                            .OrderBy(x => x.Item1).Select(x => x.Item2).ToList();
+            return GetLogLteWithTime(maxLogLevel).Select(x => x.line).ToList();
         }
 
         static MemoryLogger()
@@ -153,11 +188,11 @@
                     {
                         if (currentLog.logList.Count < MaxLogCount)
                         {
-                            currentLog.logList.Add(new Tuple<DateTime, string>(DateTime.Now, preparedMessage));
+                            currentLog.logList.Add((DateTime.Now, preparedMessage));
                         }
                         else
                         {
-                            currentLog.logList[currentLog.currentLogIndex] = new Tuple<DateTime, string>(DateTime.Now, preparedMessage);
+                            currentLog.logList[currentLog.currentLogIndex] = (DateTime.Now, preparedMessage);
                         }
 
                         if (currentLog.currentLogIndex < MaxLogCount - 1)

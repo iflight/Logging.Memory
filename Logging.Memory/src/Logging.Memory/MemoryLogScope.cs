@@ -16,7 +16,8 @@ namespace Logging.Memory
 
         public MemoryLogScope Parent { get; private set; }
 
-        private static AsyncLocal<MemoryLogScope> _value = new AsyncLocal<MemoryLogScope>();
+        private static readonly AsyncLocal<MemoryLogScope> _value = new AsyncLocal<MemoryLogScope>();
+
         public static MemoryLogScope Current
         {
             set
@@ -32,8 +33,10 @@ namespace Logging.Memory
         public static IDisposable Push(string name, object state)
         {
             var temp = Current;
-            Current = new MemoryLogScope(name, state);
-            Current.Parent = temp;
+            Current = new MemoryLogScope(name, state)
+            {
+                Parent = temp
+            };
 
             return new DisposableScope();
         }
