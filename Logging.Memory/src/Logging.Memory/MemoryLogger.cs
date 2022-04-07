@@ -138,6 +138,28 @@
             return GetLogLteWithTime(maxLogLevel).Select(x => x.line).ToList();
         }
 
+        /// <summary>
+        /// Clear all logs
+        /// </summary>
+        public static void ClearAllLogs()
+        {
+            logsDictionary.ToList().ForEach(logDictionary =>
+            {
+                ClearLogLevel(logDictionary.Key);
+            });
+        }
+
+        /// <summary>
+        /// Clear log messages with level <paramref name="logLevel"/>
+        /// </summary>
+        /// /// <param name="logLevel">Log level which should be clean</param>
+        public static void ClearLogLevel(LogLevel logLevel)
+        {
+            var levelLogs = logsDictionary.First(x => x.Key == logLevel);
+            levelLogs.Value.currentLogIndex = 0;
+            levelLogs.Value.logList.Clear();
+        }
+
         static MemoryLogger()
         {
             foreach (var level in ((LogLevel[])Enum.GetValues(typeof(LogLevel))).Where(x => x != LogLevel.None))
