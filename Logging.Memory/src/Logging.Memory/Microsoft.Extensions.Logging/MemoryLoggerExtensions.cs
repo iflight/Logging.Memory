@@ -122,6 +122,119 @@ namespace Microsoft.Extensions.Logging
             return factory.AddMemory(settings);
         }
 
+        // ILoggingBuilder Extensions
+
+        /// <summary>
+        /// Adds a memory logger that is enabled for <see cref="LogLevel.Information"/> or higher.
+        /// </summary>
+        public static ILoggingBuilder AddMemory(this ILoggingBuilder builder)
+        {
+            if (builder == null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
+
+            builder.AddProvider(new MemoryLoggerProvider((category, logLevel) => logLevel >= LogLevel.Information));
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds a memory logger that is enabled as defined by the filter function.
+        /// </summary>
+        public static ILoggingBuilder AddMemory(this ILoggingBuilder builder,
+                                                    Func<string, LogLevel, bool> filter,
+                                                    Func<LogLevel, string, string, Exception, string> logLineFormatter = null)
+        {
+            if (builder == null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
+
+            builder.AddProvider(new MemoryLoggerProvider(filter, logLineFormatter: logLineFormatter));
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds a memory logger that is enabled for <see cref="LogLevel"/>s of minLevel or higher.
+        /// </summary>
+        /// <param name="builder">ILoggingBuilder</param>
+        /// <param name="minLevel">The minimum <see cref="LogLevel"/> to be logged</param>
+        /// <param name="logLineFormatter">Formatter for output log line</param>
+        public static ILoggingBuilder AddMemory(this ILoggingBuilder builder,
+                                                    LogLevel minLevel,
+                                                    Func<LogLevel, string, string, Exception, string> logLineFormatter = null)
+        {
+            if (builder == null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
+
+            builder.AddProvider(new MemoryLoggerProvider((category, logLevel) => logLevel >= minLevel, logLineFormatter: logLineFormatter));
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds a memory logger that is enabled for <see cref="LogLevel.Information"/> or higher.
+        /// </summary>
+        public static ILoggingBuilder AddMemory(this ILoggingBuilder builder, int maxLogCount)
+        {
+            if (builder == null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
+
+            builder.AddProvider(new MemoryLoggerProvider((category, logLevel) => logLevel >= LogLevel.Information, maxLogCount));
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds a memory logger that is enabled as defined by the filter function.
+        /// </summary>
+        public static ILoggingBuilder AddMemory(this ILoggingBuilder builder, Func<string, LogLevel, bool> filter, int maxLogCount)
+        {
+            if (builder == null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
+
+            builder.AddProvider(new MemoryLoggerProvider(filter, maxLogCount));
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds a memory logger that is enabled for <see cref="LogLevel"/> of minLevel or higher.
+        /// </summary>
+        /// <param name="builder">ILoggingBuilder</param>
+        /// <param name="minLevel">The minimum <see cref="LogLevel"/> to be logged</param>
+        /// <param name="maxLogCount">Count of stored log lines</param>
+        public static ILoggingBuilder AddMemory(this ILoggingBuilder builder, LogLevel minLevel, int maxLogCount)
+        {
+            if (builder == null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
+
+            builder.AddProvider(new MemoryLoggerProvider((category, logLevel) => logLevel >= minLevel, maxLogCount));
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds a memory logger with settings object.
+        /// </summary>
+        public static ILoggingBuilder AddMemory(this ILoggingBuilder builder, IMemoryLoggerSettings settings)
+        {
+            builder.AddProvider(new MemoryLoggerProvider(settings));
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds a memory logger with settings from configuration.
+        /// </summary>
+        public static ILoggingBuilder AddMemory(this ILoggingBuilder builder, IConfiguration configuration)
+        {
+            var settings = new ConfigurationMemoryLoggerSettings(configuration);
+            return builder.AddMemory(settings);
+        }      
 
     }
 }
