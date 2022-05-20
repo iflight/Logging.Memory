@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Copyright>Igor Vinogradov, 2016</Copyright>
+    <Copyright>Igor Vinogradov, 2016, James Coverdale 2022</Copyright>
     <AssemblyTitle>Logging.Memory</AssemblyTitle>
     <VersionPrefix>1.1.0</VersionPrefix>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
@@ -21,10 +21,10 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
     <Authors>Igor Vinogradov</Authors>
-    <Version>3.1.0</Version>
+    <Version>3.2.0</Version>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyVersion>3.1.0.0</AssemblyVersion>
-    <FileVersion>3.1.0.0</FileVersion>
+    <AssemblyVersion>3.2.0.0</AssemblyVersion>
+    <FileVersion>3.2.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
