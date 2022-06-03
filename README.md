@@ -16,6 +16,10 @@ NuGet package [Logging.Memory](https://www.nuget.org/packages/Logging.Memory/)
             ...
         }
         
+or via ILoggingBuilder
+
+        builder.Logging.AddMemory(LogLevel.Debug);
+
 ### 2. Now you can get log from static List everywhere
      
     var logList = MemoryLogger.LogList;
