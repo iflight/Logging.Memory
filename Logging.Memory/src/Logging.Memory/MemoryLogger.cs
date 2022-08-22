@@ -10,8 +10,6 @@
     /// </summary>
     public class MemoryLogger : ILogger
     {
-        private static readonly object lockObj = new object();
-
         private Func<string, LogLevel, bool> filter;
 
         private readonly Func<LogLevel, string, string, Exception, string> logLineFormatter = null;
@@ -59,7 +57,7 @@
             get
             {
                 return logsDictionary
-                            .SelectMany(x => x.Value.logList)
+                            .SelectMany(x => x.Value.GetEntries())
                             .OrderByDescending(x => x.time)
                             .Take(MaxLogCount)
                             .Reverse() // keep asc sort like in 1st version
@@ -76,7 +74,7 @@
         {
             if (logsDictionary.TryGetValue(logLevel, out var log))
             {
-                return log.logList.OrderBy(x => x.time).ToList();
+                return log.GetEntries().OrderBy(x => x.time).ToList();
             }
             else
             {
@@ -102,7 +100,7 @@
         public static List<(DateTime time,string line)> GetLogGteWithTime(LogLevel minLogLevel)
         {
             return logsDictionary.Where(x => x.Key >= minLogLevel)
-                        .SelectMany(x => x.Value.logList)
+                        .SelectMany(x => x.Value.GetEntries())
                             .OrderBy(x => x.time).ToList();
         }
 
@@ -124,7 +122,7 @@
         public static List<(DateTime time, string line)> GetLogLteWithTime(LogLevel maxLogLevel)
         {
             return logsDictionary.Where(x => x.Key <= maxLogLevel)
-                        .SelectMany(x => x.Value.logList)
+                        .SelectMany(x => x.Value.GetEntries())
                             .OrderBy(x => x.time).ToList();
         }
 
@@ -184,27 +182,7 @@
                 if (!string.IsNullOrEmpty(message))
                 {
                     var preparedMessage = this.logLineFormatter(logLevel, Name, message, exception);
-                    lock (lockObj)
-                    {
-                        if (currentLog.logList.Count < MaxLogCount)
-                        {
-                            currentLog.logList.Add((DateTime.Now, preparedMessage));
-                        }
-                        else
-                        {
-                            currentLog.logList[currentLog.currentLogIndex] = (DateTime.Now, preparedMessage);
-                        }
-
-                        if (currentLog.currentLogIndex < MaxLogCount - 1)
-                        {
-                            currentLog.currentLogIndex++;
-                        }
-                        else
-                        {
-                            currentLog.currentLogIndex = 0;
-                        }
-                    }
-
+                    currentLog.Append(DateTime.Now, preparedMessage, MaxLogCount);
                 }
             }
         }
